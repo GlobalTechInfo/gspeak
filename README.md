@@ -55,7 +55,7 @@ tts.save('/tmp/hello.mp3', (err) => {
 
 ```ts
 import gSpeak from 'gspeak' // ES6 / TypeScript
-// const gSpeak = require('gspeak') // CommonJS
+// const gSpeak = require('gspeak').default // CommonJS
 ```
 
 ---
@@ -182,7 +182,7 @@ const gTTS = require('gtts')
 const tts = new gTTS('Hello', 'en')
 
 // after
-const gSpeak = require('gspeak')
+const gSpeak = require('gspeak').default
 const tts = new gSpeak('Hello', 'en')
 ```
 
