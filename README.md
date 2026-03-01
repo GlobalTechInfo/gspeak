@@ -40,7 +40,7 @@ npm i gspeak
 ## 🚀 Quick Start
 
 ```ts
-import gSpeak from 'gspeak'
+import { gSpeak } from 'gspeak'
 
 const tts = new gSpeak('Hello world', 'en')
 tts.save('/tmp/hello.mp3', (err) => {
@@ -54,8 +54,11 @@ tts.save('/tmp/hello.mp3', (err) => {
 ## 📥 Import
 
 ```ts
-import gSpeak from 'gspeak' // ES6 / TypeScript
-// const gSpeak = require('gspeak').default // CommonJS
+import { gSpeak } from 'gspeak'         // ESM ✅
+
+const { gSpeak } = require('gspeak')     // CJS ✅
+
+const gSpeak = require('gspeak').default // CJS ✅
 ```
 
 ---
@@ -65,7 +68,7 @@ import gSpeak from 'gspeak' // ES6 / TypeScript
 ### Save to file
 
 ```ts
-import gSpeak from 'gspeak'
+import { gSpeak } from 'gspeak'
 
 const tts = new gSpeak('Text to speak', 'en')
 tts.save('/tmp/output.mp3', (err) => {
@@ -78,7 +81,7 @@ tts.save('/tmp/output.mp3', (err) => {
 
 ```ts
 import express from 'express'
-import gSpeak from 'gspeak'
+import { gSpeak } from 'gspeak'
 
 const app = express()
 
@@ -103,6 +106,7 @@ const tts = new gSpeak('Hello', 'en', true) // 3rd param enables debug logging
 ## 🖥️ CLI
 
 ```bash
+npm install -g gspeak
 gspeak "Hello Google Text to Speech" -l en -o /tmp/hello.mp3
 ```
 
@@ -182,7 +186,7 @@ const gTTS = require('gtts')
 const tts = new gTTS('Hello', 'en')
 
 // after
-const gSpeak = require('gspeak').default
+const { gSpeak } = require('gspeak')
 const tts = new gSpeak('Hello', 'en')
 ```
 
