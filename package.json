@@ -1,6 +1,6 @@
 {
   "name": "gspeak",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Google Text to Speech — a modern TypeScript rewrite of gtts with zero deprecated dependencies",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
