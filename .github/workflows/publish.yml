@@ -22,6 +22,9 @@ jobs:
       - name: Update npm
         run: npm install -g npm@latest
 
+      - name: Fix package.json
+        run: npm pkg fix
+
       - name: Install dependencies
         run: npm ci
 
