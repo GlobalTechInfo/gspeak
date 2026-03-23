@@ -1,3 +1,8 @@
+/**
+ * Core gSpeak class and SaveCallback type.
+ *
+ * @module
+ */
 import generateToken from './gToken.ts'
 import LANGUAGES from './languages.ts'
 
@@ -9,6 +14,8 @@ const escapeRegExp = (s: string): string => s.replace(/[|\\{}()[\]^$+*?.]/g, '\\
 /**
  * Callback passed to the Node-style {@link gSpeak.save} overload.
  * Receives `null` on success or an `Error` on failure.
+ *
+ * @param err - `null` on success, `Error` on failure.
  */
 // deno-lint-ignore no-explicit-any
 export type SaveCallback = (err: any) => void
@@ -17,7 +24,7 @@ export type SaveCallback = (err: any) => void
  * Google Text-to-Speech client.
  *
  * Converts text to spoken MP3 audio via the Google TTS endpoint.
- * Long text is automatically split into ≤100-character chunks and reassembled.
+ * Long text is automatically split into chunks of ≤100 characters and reassembled.
  *
  * Compatible with **Node.js**, **Deno**, **Bun**, **browsers**, and **Cloudflare Workers**.
  * Use {@link stream} or {@link bytes} in browser and worker environments.
@@ -30,9 +37,16 @@ export type SaveCallback = (err: any) => void
  * ```
  */
 export class gSpeak {
+  /** The BCP 47 language code used for this instance. */
   private lang: string
+
+  /** The original text passed to the constructor. */
   private text: string
+
+  /** The text split into ≤100-character chunks ready for requests. */
   private text_parts: string[]
+
+  /** Whether debug logging is enabled. */
   private debug: boolean
 
   /**
@@ -65,6 +79,11 @@ export class gSpeak {
     this.text_parts = parts
   }
 
+  /**
+   * Returns the HTTP headers required by the Google TTS endpoint.
+   *
+   * @returns Headers object with `Referer` and `User-Agent`.
+   */
   private getHeaders(): Record<string, string> {
     return {
       'Referer': 'http://translate.google.com/',
@@ -73,6 +92,13 @@ export class gSpeak {
     }
   }
 
+  /**
+   * Builds the Google TTS request URL for a single text chunk.
+   *
+   * @param part - The text chunk to synthesize.
+   * @param idx - The index of this chunk within the full text.
+   * @returns The fully constructed request URL string.
+   */
   private getUrl(part: string, idx: number): string {
     const params = new URLSearchParams({
       ie: 'UTF-8',
@@ -90,13 +116,16 @@ export class gSpeak {
   /**
    * Returns a Web `ReadableStream<Uint8Array>` of the MP3 audio data.
    *
-   * Uses only the Web Fetch API and Streams API — compatible with
+   * Uses only the Web Fetch and Streams APIs — compatible with
    * **Node.js 18+**, **Deno**, **Bun**, **browsers**, and **Cloudflare Workers**.
+   *
+   * @returns A `ReadableStream` that emits MP3 audio chunks.
    *
    * @example
    * ```ts
+   * // Cloudflare Worker / browser
    * const stream = new gSpeak("Hello", "en").stream()
-   * const response = new Response(stream, { headers: { "Content-Type": "audio/mpeg" } })
+   * return new Response(stream, { headers: { "Content-Type": "audio/mpeg" } })
    * ```
    */
   stream(): ReadableStream<Uint8Array> {
@@ -130,10 +159,11 @@ export class gSpeak {
    *
    * Works in every runtime — **Node.js**, **Deno**, **Bun**, **browsers**, and **Cloudflare Workers**.
    *
+   * @returns A `Promise` that resolves to a `Uint8Array` containing the full MP3 data.
+   *
    * @example
    * ```ts
    * const bytes = await new gSpeak("Hello", "en").bytes()
-   * // bytes is a Uint8Array containing the MP3 data
    * ```
    */
   async bytes(): Promise<Uint8Array> {
@@ -160,10 +190,8 @@ export class gSpeak {
    * - **Deno**: uses `Deno.writeFile`
    * - **Node.js / Bun**: uses `node:fs/promises`
    *
-   * > **Not available in browsers or Cloudflare Workers.** Use {@link stream} or {@link bytes} instead.
-   *
-   * Accepts an optional Node-style callback for backward compatibility.
-   * If no callback is provided, returns a `Promise<void>`.
+   * > **Not available in browsers or Cloudflare Workers.**
+   * > Use {@link stream} or {@link bytes} instead.
    *
    * @param filePath - Path to write the MP3 file to.
    * @param callback - Optional Node-style callback `(err) => void`.
@@ -202,12 +230,27 @@ export class gSpeak {
     }
   }
 
+  /**
+   * Splits text into chunks that respect sentence boundaries and fit within `max_size`.
+   *
+   * @param text - The full text to split.
+   * @param max_size - Maximum character length per chunk.
+   * @returns An array of text chunks.
+   */
   private _tokenize(text: string, max_size: number): string[] {
     const punc = '¡!()[]¿?.,;:—«»\n'.split('').map(escapeRegExp)
     const parts = text.split(new RegExp(punc.join('|')))
     return parts.flatMap(p => this._minimize(p, ' ', max_size))
   }
 
+  /**
+   * Recursively splits a string by `delim` until all parts fit within `max_size`.
+   *
+   * @param str - The string to split.
+   * @param delim - The delimiter to split on.
+   * @param max_size - Maximum character length per part.
+   * @returns An array of strings each within `max_size`.
+   */
   private _minimize(str: string, delim: string, max_size: number): string[] {
     if (str.length <= max_size) return [str]
     const idx = str.lastIndexOf(delim)
@@ -217,10 +260,12 @@ export class gSpeak {
   /**
    * A map of all supported BCP 47 language codes to their display names.
    *
+   * @returns A `Record<string, string>` of language code to display name.
+   *
    * @example
    * ```ts
-   * console.log(gSpeak.languages["en"])  // "English"
-   * console.log(gSpeak.languages["zh-cn"])  // "Chinese (Simplified)"
+   * console.log(gSpeak.languages["en"])    // "English"
+   * console.log(gSpeak.languages["zh-cn"]) // "Chinese (Simplified)"
    * ```
    */
   static get languages(): Record<string, string> {

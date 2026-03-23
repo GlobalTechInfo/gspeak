@@ -1,7 +1,7 @@
 /**
- * @module
  * Internal token generator for authenticating requests to the Google TTS endpoint.
- * Not part of the public API.
+ *
+ * @module
  */
 
 const SALT_1 = '+-a^+6'

@@ -1,9 +1,8 @@
 /**
- * @module
  * gspeak — Google Text-to-Speech for Node.js, Deno, Bun, browsers, and Cloudflare Workers.
  *
- * Uses only Web-standard APIs (`fetch`, `ReadableStream`, `Uint8Array`) so it works
- * in any runtime. File-saving via {@link gSpeak.save} is supported in Node, Deno, and Bun.
+ * Uses only Web-standard APIs (`fetch`, `ReadableStream`, `Uint8Array`) so it runs
+ * in any modern runtime. File saving via {@link gSpeak.save} is available in Node, Deno, and Bun.
  *
  * @example
  * ```ts
@@ -11,15 +10,17 @@
  *
  * const tts = new gSpeak("Hello world", "en")
  *
- * // Stream audio (browsers, Cloudflare Workers, Node 18+, Deno, Bun)
+ * // Stream audio (works everywhere)
  * const stream = tts.stream()
  *
- * // Get raw MP3 bytes
+ * // Get raw MP3 bytes (works everywhere)
  * const bytes = await tts.bytes()
  *
- * // Save to file (Node, Deno, Bun)
+ * // Save to file (Node, Deno, Bun only)
  * await tts.save("hello.mp3")
  * ```
+ *
+ * @module
  */
 export { gSpeak as default, gSpeak } from './gSpeak.ts'
 export type { SaveCallback } from './gSpeak.ts'

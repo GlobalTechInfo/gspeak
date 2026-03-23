@@ -1,7 +1,7 @@
 /**
+ * Map of all BCP 47 language codes supported by the Google TTS API.
+ *
  * @module
- * Map of supported BCP 47 language codes to their display names.
- * Used by {@link gSpeak} to validate the `lang` parameter.
  */
 
 /**
@@ -12,9 +12,8 @@
  * ```ts
  * import { LANGUAGES } from "gspeak"
  *
- * console.log(LANGUAGES["en"])     // "English"
- * console.log(LANGUAGES["zh-cn"])  // "Chinese (Simplified)"
- * console.log(LANGUAGES["fr"])     // "French"
+ * console.log(LANGUAGES["en"])    // "English"
+ * console.log(LANGUAGES["zh-cn"]) // "Chinese (Simplified)"
  * ```
  */
 const LANGUAGES: Record<string, string> = {
