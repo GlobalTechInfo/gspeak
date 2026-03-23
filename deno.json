@@ -36,6 +36,7 @@
   "publish": {
     "include": [
       "lib/**/*.ts",
+      "README.md",
       "LICENSE"
     ],
     "exclude": [
