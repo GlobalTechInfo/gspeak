@@ -1,55 +1,63 @@
-const SALT_1 = '+-a^+6';
-const SALT_2 = '+-3^+b+-f';
+/**
+ * @module
+ * Internal token generator for authenticating requests to the Google TTS endpoint.
+ * Not part of the public API.
+ */
+
+const SALT_1 = '+-a^+6'
+const SALT_2 = '+-3^+b+-f'
 
 function xr(a: number, b: string): number {
   for (let c = 0; c < b.length - 2; c += 3) {
-    const d = b.charAt(c + 2);
-    const dVal = d >= 'a' ? d.charCodeAt(0) - 87 : Number(d);
-    const shifted = b.charAt(c + 1) === '+' ? a >>> dVal : a << dVal;
-    a = b.charAt(c) === '+' ? (a + shifted) & 4294967295 : a ^ shifted;
+    const d = b.charAt(c + 2)
+    const dVal = d >= 'a' ? d.charCodeAt(0) - 87 : Number(d)
+    const shifted = b.charAt(c + 1) === '+' ? a >>> dVal : a << dVal
+    a = b.charAt(c) === '+' ? (a + shifted) & 4294967295 : a ^ shifted
   }
-  return a;
+  return a
 }
 
+/**
+ * Generates a `tk` token required by the Google TTS API for a given text string.
+ *
+ * @param text - The text to generate a token for.
+ * @returns A token string in the format `"number.number"`.
+ */
 function generateToken(text: string): string {
-  const tokenKey = Math.floor(Date.now() / 3600);
+  const tokenKey = Math.floor(Date.now() / 3600)
 
-  const bytes: number[] = [];
-  let e = 0;
+  const bytes: number[] = []
+  let e = 0
   for (let f = 0; f < text.length; f++) {
-    let g = text.charCodeAt(f);
+    let g = text.charCodeAt(f)
     if (g < 128) {
-      bytes[e++] = g;
+      bytes[e++] = g
     } else if (g < 2048) {
-      bytes[e++] = (g >> 6) | 192;
-      bytes[e++] = (g & 63) | 128;
-    } else if (
-      (g & 64512) === 55296 &&
-      f + 1 < text.length &&
-      (text.charCodeAt(f + 1) & 64512) === 56320
-    ) {
-      g = 65536 + ((g & 1023) << 10) + (text.charCodeAt(++f) & 1023);
-      bytes[e++] = (g >> 18) | 240;
-      bytes[e++] = ((g >> 12) & 63) | 128;
-      bytes[e++] = ((g >> 6) & 63) | 128;
-      bytes[e++] = (g & 63) | 128;
+      bytes[e++] = (g >> 6) | 192
+      bytes[e++] = (g & 63) | 128
+    } else if ((g & 64512) === 55296 && f + 1 < text.length && (text.charCodeAt(f + 1) & 64512) === 56320) {
+      g = 65536 + ((g & 1023) << 10) + (text.charCodeAt(++f) & 1023)
+      bytes[e++] = (g >> 18) | 240
+      bytes[e++] = ((g >> 12) & 63) | 128
+      bytes[e++] = ((g >> 6) & 63) | 128
+      bytes[e++] = (g & 63) | 128
     } else {
-      bytes[e++] = (g >> 12) | 224;
-      bytes[e++] = ((g >> 6) & 63) | 128;
-      bytes[e++] = (g & 63) | 128;
+      bytes[e++] = (g >> 12) | 224
+      bytes[e++] = ((g >> 6) & 63) | 128
+      bytes[e++] = (g & 63) | 128
     }
   }
 
-  let a = tokenKey;
+  let a = tokenKey
   for (let i = 0; i < bytes.length; i++) {
-    a += bytes[i];
-    a = xr(a, SALT_1);
+    a += bytes[i]
+    a = xr(a, SALT_1)
   }
-  a = xr(a, SALT_2);
-  if (a < 0) a = (a & 2147483647) + 2147483648;
-  a %= 1e6;
+  a = xr(a, SALT_2)
+  if (a < 0) a = (a & 2147483647) + 2147483648
+  a %= 1e6
 
-  return `${a}.${a ^ tokenKey}`;
+  return `${a}.${a ^ tokenKey}`
 }
 
-export default generateToken;
+export default generateToken

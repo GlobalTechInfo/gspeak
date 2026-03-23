@@ -1,3 +1,22 @@
+/**
+ * @module
+ * Map of supported BCP 47 language codes to their display names.
+ * Used by {@link gSpeak} to validate the `lang` parameter.
+ */
+
+/**
+ * A map of all BCP 47 language codes supported by the Google TTS API
+ * to their English display names.
+ *
+ * @example
+ * ```ts
+ * import { LANGUAGES } from "gspeak"
+ *
+ * console.log(LANGUAGES["en"])     // "English"
+ * console.log(LANGUAGES["zh-cn"])  // "Chinese (Simplified)"
+ * console.log(LANGUAGES["fr"])     // "French"
+ * ```
+ */
 const LANGUAGES: Record<string, string> = {
   'af': 'Afrikaans',
   'sq': 'Albanian',
@@ -81,6 +100,6 @@ const LANGUAGES: Record<string, string> = {
   'ur': 'Urdu',
   'vi': 'Vietnamese',
   'cy': 'Welsh',
-};
+}
 
-export default LANGUAGES;
+export default LANGUAGES
