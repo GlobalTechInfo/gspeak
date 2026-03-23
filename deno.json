@@ -1,0 +1,61 @@
+{
+  "name": "@globaltech/gspeak",
+  "version": "0.0.1",
+  "nodeModulesDir": "none",
+  "author": "Qasim Ali",
+  "license": "MIT",
+  "description": "Google Text to Speech",
+  "keywords": [
+    "google",
+    "tts",
+    "text-to-speech",
+    "gtts",
+    "gspeak",
+    "speech",
+    "audio",
+    "typescript"
+  ],
+  "lint": {
+    "include": ["lib/"],
+    "exclude": [
+      "tests/",
+      "bin/",
+      "eslint.config.mjs",
+      "tsconfig.json",
+      "src/",
+      "package*.json",
+      "verify-languages.ts",
+      "node_modules/",
+      "dist/"
+    ]
+  },
+  "exports": {
+    ".": "./lib/index.ts",
+    "./languages": "./lib/languages.ts"
+  },
+  "publish": {
+    "include": [
+      "lib/**/*.ts",
+      "LICENSE"
+    ],
+    "exclude": [
+      "tests/**",
+      "bin/**",
+      "eslint.config.mjs",
+      "tsconfig.json",      
+      "src/**",
+      "package*.json",
+      "verify-languages.ts",
+      "node_modules/**",
+      "dist/**"
+    ]
+  },
+  "tasks": {
+    "dev": "deno run --watch lib/index.ts"
+  },
+  "imports": {},
+  "fmt": {
+    "indentWidth": 2,
+    "singleQuote": true
+  }
+}

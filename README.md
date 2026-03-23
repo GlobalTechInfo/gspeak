@@ -8,11 +8,12 @@
 
 A TypeScript rewrite of [gtts](https://www.npmjs.com/package/gtts) — drop-in compatible.
 
-[![License](https://img.shields.io/npm/l/gspeak?style=flat-square&label=License&color=blue)](https://github.com/GlobalTechInfo/gspeak/blob/main/LICENSE)
 [![Coverage](https://codecov.io/gh/GlobalTechInfo/gspeak/branch/main/graph/badge.svg)](https://codecov.io/gh/GlobalTechInfo/gspeak)
-[![NPM Version](https://img.shields.io/npm/v/gspeak?style=flat-square&label=Version&color=red)](https://npmjs.com/package/gspeak)
+[![NPM Version](https://img.shields.io/npm/v/gspeak?style=flat-square&label=NPM%20Version&color=red)](https://npmjs.com/package/gspeak)
 [![Code Quality](https://img.shields.io/codefactor/grade/github/GlobalTechInfo/gspeak?style=flat-square&label=Code%20Quality)](https://www.codefactor.io/repository/github/GlobalTechInfo/gspeak)
 [![Downloads](https://img.shields.io/npm/dw/gspeak?style=flat-square&label=Downloads&color=green)](https://npmjs.com/package/gspeak)
+[![JSR Version](https://jsr.io/badges/@globaltech/gspeak?style=flat-square)](https://jsr.io/@globaltech/gspeak)
+
 
 </div>
 
@@ -31,16 +32,26 @@ A TypeScript rewrite of [gtts](https://www.npmjs.com/package/gtts) — drop-in c
 
 ## 📦 Installation
 
+### Node.js (NPM)
+
 ```bash
 npm i gspeak
 ```
 
+### Deno / Bun / Modern (JSR)
+
+```bash
+deno add @globaltech/gspeak
+# or
+npx jsr add @globaltech/gspeak
+```
 ---
 
 ## 🚀 Quick Start
 
 ```ts
 import { gSpeak } from 'gspeak'
+// Use 'jsr:@globaltech/gspeak' for Deno
 
 const tts = new gSpeak('Hello world', 'en')
 tts.save('/tmp/hello.mp3', (err) => {
@@ -48,7 +59,6 @@ tts.save('/tmp/hello.mp3', (err) => {
   console.log('Saved to /tmp/hello.mp3')
 })
 ```
-
 ---
 
 ## 📥 Import
@@ -58,7 +68,7 @@ import { gSpeak } from 'gspeak'         // ESM ✅
 
 const { gSpeak } = require('gspeak')     // CJS ✅
 
-const gSpeak = require('gspeak').default   // CJS ✅
+import { gSpeak } from 'jsr:@globaltech/gspeak' // JSR ✅
 ```
 
 ---
@@ -113,6 +123,17 @@ console.log(gSpeak.languages)
 ```ts
 const tts = new gSpeak('Hello', 'en', true) // 3rd param enables debug logging
 ```
+
+---
+
+### 🛡️ Deno Permissions
+If you are using this package in Deno, you must grant network and file system access:
+```bash
+deno run --allow-net=translate.google.com --allow-write=/tmp main.ts
+```
+
+- --allow-net: Required to connect to the Google TTS API. 
+- --allow-write: Required only if you use the .save() method.
 
 ---
 
