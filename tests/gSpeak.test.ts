@@ -156,6 +156,34 @@ describe('gSpeak — Constructor', () => {
     expect(() => new gSpeak('This sentence is intentionally longer than one hundred characters so that the tokenizer will split it up into multiple parts.', 'en')).not.toThrow()
   })
 
+  it('splits a long clause with spaces into chunks of <= 100 chars (issue #1)', () => {
+    const g = new gSpeak('word '.repeat(60).trim(), 'en')
+    expect(g.text_parts.every(p => p.length <= 100)).toBe(true)
+    // must have produced more than one chunk
+    expect(g.text_parts.length).toBeGreaterThan(1)
+  })
+
+  it('does not overflow the stack on >100 chars with no spaces (issue #1)', () => {
+    // CJK text: 13 chars x 10 = 130, no spaces
+    const g = new gSpeak('你好世界，这是一个测试。'.repeat(10), 'zh')
+    expect(g.text_parts.every(p => p.length <= 100)).toBe(true)
+  })
+
+  it('does not overflow the stack on a long URL / no-space token (issue #1)', () => {
+    const g = new gSpeak('https://example.com/' + 'a'.repeat(150), 'en')
+    expect(g.text_parts.every(p => p.length <= 100)).toBe(true)
+  })
+
+  it('handles a >=100-char token that follows a space (issue #1)', () => {
+    const g = new gSpeak('ok ' + 'x'.repeat(120) + ' end', 'en')
+    expect(g.text_parts.every(p => p.length <= 100)).toBe(true)
+  })
+
+  it('keeps a 100-char string as a single chunk', () => {
+    const g = new gSpeak('a'.repeat(100), 'en')
+    expect(g.text_parts).toEqual(['a'.repeat(100)])
+  })
+
   it('should handle text that splits on punctuation', () => {
     expect(() => new gSpeak('Hello! How are you? I am fine. Great: let us go now (please).', 'en')).not.toThrow()
   })

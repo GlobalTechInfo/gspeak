@@ -99,7 +99,13 @@ export class gSpeak {
 
   private _minimize(str: string, delim: string, max_size: number): string[] {
     if (str.length <= max_size) return [str]
-    const idx = str.lastIndexOf(delim)
+    // Find the LAST delimiter within the first max_size chars. If the split would
+    // leave an empty head (idx === 0, no leading delimiter) or no delimiter at
+    // all, take a hard slice of max_size so we always make progress. This bounds
+    // recursion depth and avoids infinite recursion / stack overflow on long
+    // no-delimiter runs (CJK, URLs, long tokens).
+    const idx = str.lastIndexOf(delim, max_size - 1)
+    if (idx <= 0) return [str.substring(0, max_size), ...this._minimize(str.substring(max_size), delim, max_size)]
     return [str.substring(0, idx), ...this._minimize(str.substring(idx), delim, max_size)]
   }
 

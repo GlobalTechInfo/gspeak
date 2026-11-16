@@ -22,6 +22,6 @@
  *
  * @module
  */
-export { gSpeak as default, gSpeak } from './gSpeak.ts'
-export type { SaveCallback } from './gSpeak.ts'
-export { default as LANGUAGES } from './languages.ts'
+export { gSpeak, gSpeak as default } from './gSpeak.ts';
+export type { SaveCallback } from './gSpeak.ts';
+export { default as LANGUAGES } from './languages.ts';

@@ -34,3 +34,27 @@ jobs:
           flags: unittests
           name: gspeak-coverage
           fail_ci_if_error: true
+
+  deno:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Run Deno tests
+        run: deno task test
+
+      - name: Deno type-check
+        run: deno task check
+
+      - name: Deno lint
+        run: deno task lint
+
+      - name: Deno format check
+        run: deno fmt --check lib/ tests/deno/

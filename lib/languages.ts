@@ -99,6 +99,6 @@ const LANGUAGES: Record<string, string> = {
   'ur': 'Urdu',
   'vi': 'Vietnamese',
   'cy': 'Welsh',
-}
+};
 
-export default LANGUAGES
+export default LANGUAGES;

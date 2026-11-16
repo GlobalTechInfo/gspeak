@@ -3,13 +3,14 @@
  *
  * @module
  */
-import generateToken from './gToken.ts'
-import LANGUAGES from './languages.ts'
+import generateToken from './gToken.ts';
+import LANGUAGES from './languages.ts';
 
-const GOOGLE_TTS_URL = 'https://translate.google.com/translate_tts'
-const MAX_CHARS = 100
+const GOOGLE_TTS_URL = 'https://translate.google.com/translate_tts';
+const MAX_CHARS = 100;
 
-const escapeRegExp = (s: string): string => s.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&')
+const escapeRegExp = (s: string): string =>
+  s.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&');
 
 /**
  * Callback passed to the Node-style {@link gSpeak.save} overload.
@@ -18,7 +19,7 @@ const escapeRegExp = (s: string): string => s.replace(/[|\\{}()[\]^$+*?.]/g, '\\
  * @param err - `null` on success, `Error` on failure.
  */
 // deno-lint-ignore no-explicit-any
-export type SaveCallback = (err: any) => void
+export type SaveCallback = (err: any) => void;
 
 /**
  * Google Text-to-Speech client.
@@ -38,16 +39,16 @@ export type SaveCallback = (err: any) => void
  */
 export class gSpeak {
   /** The BCP 47 language code used for this instance. */
-  private lang: string
+  private lang: string;
 
   /** The original text passed to the constructor. */
-  private text: string
+  private text: string;
 
   /** The text split into ≤100-character chunks ready for requests. */
-  private text_parts: string[]
+  private text_parts: string[];
 
   /** Whether debug logging is enabled. */
-  private debug: boolean
+  private debug: boolean;
 
   /**
    * Creates a new `gSpeak` instance.
@@ -64,19 +65,25 @@ export class gSpeak {
    * ```
    */
   constructor(text: string, lang = 'en', debug = false) {
-    this.debug = debug
+    this.debug = debug;
 
-    if (!LANGUAGES[lang.toLowerCase()])
-      throw new Error(`Language not supported: ${lang}`)
-    this.lang = lang.toLowerCase()
+    if (!LANGUAGES[lang.toLowerCase()]) {
+      throw new Error(`Language not supported: ${lang}`);
+    }
+    this.lang = lang.toLowerCase();
 
-    if (!text)
-      throw new Error('No text to speak')
-    this.text = text
+    if (!text) {
+      throw new Error('No text to speak');
+    }
+    this.text = text;
 
-    let parts = text.length <= MAX_CHARS ? [text] : this._tokenize(text, MAX_CHARS)
-    parts = parts.map(p => p.replace(/\\n/g, '').trim()).filter(p => p.length > 0)
-    this.text_parts = parts
+    let parts = text.length <= MAX_CHARS
+      ? [text]
+      : this._tokenize(text, MAX_CHARS);
+    parts = parts.map((p) => p.replace(/\\n/g, '').trim()).filter((p) =>
+      p.length > 0
+    );
+    this.text_parts = parts;
   }
 
   /**
@@ -89,7 +96,7 @@ export class gSpeak {
       'Referer': 'http://translate.google.com/',
       'User-Agent':
         'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36',
-    }
+    };
   }
 
   /**
@@ -109,8 +116,8 @@ export class gSpeak {
       client: 'tw-ob',
       textlen: String(part.length),
       tk: generateToken(part),
-    })
-    return `${GOOGLE_TTS_URL}?${params}`
+    });
+    return `${GOOGLE_TTS_URL}?${params}`;
   }
 
   /**
@@ -129,29 +136,29 @@ export class gSpeak {
    * ```
    */
   stream(): ReadableStream<Uint8Array> {
-    const parts = this.text_parts
-    const getUrl = this.getUrl.bind(this)
-    const getHeaders = this.getHeaders.bind(this)
-    const debug = this.debug
+    const parts = this.text_parts;
+    const getUrl = this.getUrl.bind(this);
+    const getHeaders = this.getHeaders.bind(this);
+    const debug = this.debug;
 
     return new ReadableStream<Uint8Array>({
       async start(controller) {
         try {
           for (const [idx, part] of parts.entries()) {
-            const url = getUrl(part, idx)
-            if (debug) console.log({ part, idx, url })
+            const url = getUrl(part, idx);
+            if (debug) console.log({ part, idx, url });
 
-            const res = await fetch(url, { headers: getHeaders() })
-            if (!res.ok) throw new Error(`Request failed: ${res.status}`)
+            const res = await fetch(url, { headers: getHeaders() });
+            if (!res.ok) throw new Error(`Request failed: ${res.status}`);
 
-            controller.enqueue(new Uint8Array(await res.arrayBuffer()))
+            controller.enqueue(new Uint8Array(await res.arrayBuffer()));
           }
-          controller.close()
+          controller.close();
         } catch (err) {
-          controller.error(err)
+          controller.error(err);
         }
       },
-    })
+    });
   }
 
   /**
@@ -167,21 +174,21 @@ export class gSpeak {
    * ```
    */
   async bytes(): Promise<Uint8Array> {
-    const chunks: Uint8Array[] = []
-    const reader = this.stream().getReader()
+    const chunks: Uint8Array[] = [];
+    const reader = this.stream().getReader();
     while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-      chunks.push(value)
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value);
     }
-    const total = chunks.reduce((n, c) => n + c.length, 0)
-    const out = new Uint8Array(total)
-    let offset = 0
+    const total = chunks.reduce((n, c) => n + c.length, 0);
+    const out = new Uint8Array(total);
+    let offset = 0;
     for (const chunk of chunks) {
-      out.set(chunk, offset)
-      offset += chunk.length
+      out.set(chunk, offset);
+      offset += chunk.length;
     }
-    return out
+    return out;
   }
 
   /**
@@ -205,28 +212,28 @@ export class gSpeak {
    * tts.save("output.mp3", (err) => { if (err) throw err })
    * ```
    */
-  async save(filePath: string): Promise<void>
-  save(filePath: string, callback: SaveCallback): void
+  async save(filePath: string): Promise<void>;
+  save(filePath: string, callback: SaveCallback): void;
   save(filePath: string, callback?: SaveCallback): void | Promise<void> {
     const run = async (): Promise<void> => {
-      const data = await this.bytes()
+      const data = await this.bytes();
 
       if (typeof Deno !== 'undefined') {
         // deno-lint-ignore no-explicit-any
-        await (globalThis as any).Deno.writeFile(filePath, data)
-        return
+        await (globalThis as any).Deno.writeFile(filePath, data);
+        return;
       }
 
       // Node / Bun
       // deno-lint-ignore no-explicit-any
-      const { writeFile } = await import('node:fs/promises') as any
-      await writeFile(filePath, data)
-    }
+      const { writeFile } = await import('node:fs/promises') as any;
+      await writeFile(filePath, data);
+    };
 
     if (callback) {
-      run().then(() => callback(null)).catch(callback)
+      run().then(() => callback(null)).catch(callback);
     } else {
-      return run()
+      return run();
     }
   }
 
@@ -238,9 +245,9 @@ export class gSpeak {
    * @returns An array of text chunks.
    */
   private _tokenize(text: string, max_size: number): string[] {
-    const punc = '¡!()[]¿?.,;:—«»\n'.split('').map(escapeRegExp)
-    const parts = text.split(new RegExp(punc.join('|')))
-    return parts.flatMap(p => this._minimize(p, ' ', max_size))
+    const punc = '¡!()[]¿?.,;:—«»\n'.split('').map(escapeRegExp);
+    const parts = text.split(new RegExp(punc.join('|')));
+    return parts.flatMap((p) => this._minimize(p, ' ', max_size));
   }
 
   /**
@@ -252,9 +259,23 @@ export class gSpeak {
    * @returns An array of strings each within `max_size`.
    */
   private _minimize(str: string, delim: string, max_size: number): string[] {
-    if (str.length <= max_size) return [str]
-    const idx = str.lastIndexOf(delim)
-    return [str.substring(0, idx), ...this._minimize(str.substring(idx), delim, max_size)]
+    if (str.length <= max_size) return [str];
+    // Find the LAST delimiter within the first max_size chars. If the split would
+    // leave an empty head (idx === 0, no leading delimiter) or no delimiter at
+    // all, take a hard slice of max_size so we always make progress. This bounds
+    // recursion depth and avoids infinite recursion / stack overflow on long
+    // no-delimiter runs (CJK, URLs, long tokens).
+    const idx = str.lastIndexOf(delim, max_size - 1);
+    if (idx <= 0) {
+      return [
+        str.substring(0, max_size),
+        ...this._minimize(str.substring(max_size), delim, max_size),
+      ];
+    }
+    return [
+      str.substring(0, idx),
+      ...this._minimize(str.substring(idx), delim, max_size),
+    ];
   }
 
   /**
@@ -269,8 +290,8 @@ export class gSpeak {
    * ```
    */
   static get languages(): Record<string, string> {
-    return LANGUAGES
+    return LANGUAGES;
   }
 }
 
-export default gSpeak
+export default gSpeak;
